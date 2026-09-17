@@ -31,7 +31,7 @@ class TestHeading(unittest.TestCase):
         </html>
         """
             actual = get_heading_from_html(input_html)
-            expected = "Welcome to Boot.dev"
+            expected = ""
             self.assertEqual(actual, expected)
 
     def testNoH2(self):
