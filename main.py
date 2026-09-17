@@ -7,7 +7,7 @@ import urllib.parse
 #from get_heading_from_html import get_heading_from_html
 import sys
 from typing import TypedDict
-
+import requests
 
 class PageData(TypedDict):
     url: str
@@ -88,6 +88,18 @@ def normalize_url(url: str) -> str:
     full_path = full_path.rstrip("/")
     return full_path.lower()
 
+def get_html(url: str) -> str:
+    try:
+        html = requests.get(url, headers={"User-Agent": "BootCrawler/1.0"})
+        if html.status_code >= 400:
+            raise Exception(f"HTTP error {html.status_code}")
+        if not "text/html" in html.headers["content-type"]:
+            raise Exception(f"Error: Response content is not text: {html.headers["content-type"]}")
+    except:
+        raise Exception("Other error has occurred")
+    return html.text
+    
+
 def main(args = sys.argv):
     if len(args) < 2:
         print("no website provided")
@@ -97,5 +109,7 @@ def main(args = sys.argv):
         exit(1)
     BASE_URL = args[1]
     print(f"starting crawl of: {BASE_URL}")
+    html = get_html(BASE_URL)
+    print(html)
 
 main()
