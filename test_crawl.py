@@ -8,17 +8,22 @@ class TestCrawl(unittest.TestCase):
         expected = "www.boot.dev/blog/path"
         self.assertEqual(actual, expected)
 
-    def test_http(self):
-        input_url = "http://www.boot.dev/blog/path"
+    def test_normalize_url_slash(self) -> None:
+        input_url = "https://crawler-test.com/path/"
         actual = normalize_url(input_url)
-        expected = "www.boot.dev/blog/path"
+        expected = "crawler-test.com/path"
         self.assertEqual(actual, expected)
 
-
-    def test_query(self):
-        input_url = "http://www.boot.dev/blog/path?length=min"
+    def test_normalize_url_capitals(self) -> None:
+        input_url = "https://CRAWLER-TEST.com/path"
         actual = normalize_url(input_url)
-        expected = "www.boot.dev/blog/path?length=min"
+        expected = "crawler-test.com/path"
+        self.assertEqual(actual, expected)
+
+    def test_normalize_url_http(self) -> None:
+        input_url = "http://CRAWLER-TEST.com/path"
+        actual = normalize_url(input_url)
+        expected = "crawler-test.com/path"
         self.assertEqual(actual, expected)
 
 if __name__ == "__main__":
