@@ -7,7 +7,7 @@ import urllib.parse
 #from get_heading_from_html import get_heading_from_html
 import sys
 from typing import TypedDict
-import requests
+import requests, pprint
 
 class PageData(TypedDict):
     url: str
@@ -98,7 +98,31 @@ def get_html(url: str) -> str:
     except:
         raise Exception("Other error has occurred")
     return html.text
-    
+
+def crawl_page(base_url, current_url = None, page_data = None):
+    if current_url == None:
+        current_url = base_url
+    if page_data == None:
+        page_data = {}
+    if not urllib.parse.urlparse(base_url).netloc == urllib.parse.urlparse(current_url).netloc:
+        return 
+
+    current_url_normal = normalize_url(current_url)
+
+    if current_url_normal in page_data.keys():
+        return
+
+    current_url_html = get_html(current_url)
+    print(f"Now crawling: {current_url_normal}")
+
+    page_data[current_url_normal] = extract_page_data(current_url_html, current_url)
+
+    for link in page_data[current_url_normal]["outgoing_links"]:
+        crawl_page(base_url, link, page_data)
+
+    return page_data
+
+
 
 def main(args = sys.argv):
     if len(args) < 2:
@@ -109,7 +133,11 @@ def main(args = sys.argv):
         exit(1)
     BASE_URL = args[1]
     print(f"starting crawl of: {BASE_URL}")
-    html = get_html(BASE_URL)
-    print(html)
+    html = crawl_page(BASE_URL)
+    print(f"Crawl complete.\nPages found: {len(html)}\nList of pages found:")
+    # for link, info in html.items():
+    #     print(info["url"])
+    print(f"\nInformation for the last page crawled:")
+    pprint.pprint(next(reversed(html.items())))
 
 main()
