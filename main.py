@@ -8,6 +8,7 @@ import urllib.parse
 import sys
 from typing import TypedDict
 import pprint, asyncio, aiohttp
+from json_report import write_json_report
 
 class PageData(TypedDict):
     url: str
@@ -217,11 +218,14 @@ async def main(args = sys.argv):
     MAX_PAGES = int(args[3])
     print(f"starting crawl of: {BASE_URL}")
     page_data = await crawl_site_async(BASE_URL, MAX_CONCUR, MAX_PAGES)
-    print(f"----- Crawl complete. -----\nPages found: {len(page_data)}\n-----\nList of pages found:")
-    for link, info in page_data.items():
-        print(info["url"])
-    print(f"\nInformation for the last page crawled:")
-    pprint.pprint(next(reversed(page_data.items())))
+    print(f"----- Crawl complete. -----\nPages found: {len(page_data)}")
+    # for link, info in page_data.items():
+    #     print(info["url"])
+    # print(f"\nInformation for the last page crawled:")
+    # pprint.pprint(next(reversed(page_data.items())))
+
+    write_json_report(page_data)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
